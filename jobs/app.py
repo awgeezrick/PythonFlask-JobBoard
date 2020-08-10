@@ -1,5 +1,6 @@
-from flask import Flask,render_template,g
 import sqlite3
+import datetime
+from flask import Flask, render_template, g, request, redirect, url_for
 
 PATH = r'db/jobs.sqlite'
 
@@ -53,10 +54,6 @@ def employer(employer_id):
 
 @app.route('/employer/<employer_id>/review',methods=['GET','POST'])
 def review(employer_id):
-    from flask import request
-    import datetime
-    from flask import redirect, url_for
-
     if request.method == 'POST':
         review = request.form['review']
         rating = request.form['rating']
@@ -64,6 +61,7 @@ def review(employer_id):
         status = request.form['status']
         date = datetime.datetime.now().strftime("%m/%d/%Y")
         execute_sql('INSERT INTO review (review, rating, title, date, status, employer_id) VALUES (?, ?, ?, ?, ?, ?)',(review, rating, title, date, status, employer_id),commit=True)
-        return redirect(url_for(employer,employer_id=employer_id))
-    else:
-        return render_template('review.html',employer_id=employer_id)
+
+        return redirect(url_for('employer',employer_id=employer_id))
+
+    return render_template('review.html',employer_id=employer_id)
